@@ -16,74 +16,73 @@ body{margin:0;background:var(--bg);color:var(--text);
 font-family:Inter,system-ui,Arial,sans-serif}
 header{padding:25px 5%;border-bottom:1px solid var(--border);
 background:#101827}
-.brand{color:var(--gold);font-size:12px;letter-spacing:3px;
-font-weight:800}
+.brand{color:var(--gold);font-size:12px;letter-spacing:3px;font-weight:800}
 h1{font-size:27px;margin:9px 0 5px}
 .sub{color:var(--muted);font-size:13px}
-main{max-width:1450px;margin:auto;padding:28px 5%}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);
-gap:14px;margin-bottom:22px}
-.card{background:var(--panel);border:1px solid var(--border);
-border-radius:12px;padding:19px}
+main{max-width:1600px;margin:auto;padding:28px 5%}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:19px}
 .card small{color:var(--muted)}
 .value{font-size:27px;font-weight:750;margin-top:9px}
 .gold{color:var(--gold)}
 .section{margin:27px 0 13px;font-size:18px}
 .controls{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
-input,select{background:var(--panel);color:var(--text);
-border:1px solid var(--border);border-radius:8px;
-padding:12px;font-size:14px}
+input,select{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:14px}
 input{flex:1;min-width:190px}
-.table-wrap{overflow-x:auto;background:var(--panel);
-border:1px solid var(--border);border-radius:12px}
-table{width:100%;border-collapse:collapse;min-width:950px}
-th,td{text-align:left;padding:14px 12px;
-border-bottom:1px solid var(--border);font-size:13px}
-th{color:var(--muted);font-weight:600;white-space:nowrap}
-th button{background:none;color:inherit;border:0;
-font:inherit;cursor:pointer}
+.table-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:1500px}
+th,td{text-align:left;padding:13px 11px;border-bottom:1px solid var(--border);font-size:12px;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
 tbody tr:hover{background:var(--panel2)}
 .ticker{font-weight:800;color:var(--gold)}
 .positive{color:var(--green)}
 .negative{color:var(--red)}
-.pill{display:inline-block;padding:4px 8px;
-border-radius:20px;background:#25364c;font-size:11px}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#25364c;font-size:11px}
 .warning{color:#fbbf24}
 .good{color:var(--green)}
 .muted{color:var(--muted)}
 .status{padding:13px 0;color:var(--muted);font-size:12px}
-.disclaimer{margin-top:25px;padding:16px;
-border:1px solid var(--border);border-radius:10px;
-color:var(--muted);font-size:12px;line-height:1.6}
+.disclaimer{margin-top:25px;padding:16px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:12px;line-height:1.6}
+.coverage{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.coverage .card{padding:16px}
+.coverage .value{font-size:23px}
+.coverage-note{color:var(--muted);font-size:12px;line-height:1.6;margin-top:12px}
 @media(max-width:750px){
-.cards{grid-template-columns:repeat(2,1fr)}
+.cards,.coverage{grid-template-columns:repeat(2,1fr)}
 main{padding:20px 4%}
 h1{font-size:23px}
 }
-@media(max-width:400px){.cards{grid-template-columns:1fr 1fr}
-.value{font-size:22px}}
+@media(max-width:400px){
+.cards,.coverage{grid-template-columns:1fr 1fr}
+.value{font-size:21px}
+}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">MIND & MONEY AI</div>
   <h1>Stock Research Center</h1>
-  <div class="sub">Weekly discovery · Company research · Data quality</div>
+  <div class="sub">Weekly discovery · Company research · Financial data quality</div>
 </header>
 
 <main>
   <div class="cards">
-    <div class="card"><small>Stocks scanned</small>
-      <div class="value gold" id="total">—</div></div>
-    <div class="card"><small>Average research score</small>
-      <div class="value" id="average">—</div></div>
-    <div class="card"><small>Complete records</small>
-      <div class="value" id="complete">—</div></div>
-    <div class="card"><small>Top research score</small>
-      <div class="value gold" id="top">—</div></div>
+    <div class="card"><small>Stocks scanned</small><div class="value gold" id="total">—</div></div>
+    <div class="card"><small>Average research score</small><div class="value" id="average">—</div></div>
+    <div class="card"><small>Complete records</small><div class="value" id="complete">—</div></div>
+    <div class="card"><small>Top research score</small><div class="value gold" id="top">—</div></div>
   </div>
 
-  <h2 class="section">Research rankings</h2>
+  <h2 class="section">Financial data coverage</h2>
+  <div class="coverage">
+    <div class="card"><small>FMP financial records</small><div class="value gold" id="fmpCount">—</div></div>
+    <div class="card"><small>Yahoo fallback records</small><div class="value" id="yahooCount">—</div></div>
+    <div class="card"><small>FMP income statements</small><div class="value" id="incomeCount">—</div></div>
+    <div class="card"><small>FMP balance sheets</small><div class="value" id="balanceCount">—</div></div>
+  </div>
+  <div class="coverage-note" id="coverageNote">Loading financial data coverage...</div>
+
+  <h2 class="section">Research rankings and financial fundamentals</h2>
   <div class="controls">
     <input id="search" placeholder="Search ticker or company...">
     <select id="cap">
@@ -96,6 +95,7 @@ h1{font-size:23px}
       <option value="score">Highest score</option>
       <option value="momentum_3m">3-month momentum</option>
       <option value="revenue_growth">Revenue growth</option>
+      <option value="earnings_growth">Earnings growth</option>
       <option value="market_cap">Market capitalization</option>
     </select>
   </div>
@@ -105,23 +105,26 @@ h1{font-size:23px}
       <thead><tr>
         <th>Company</th><th>Sector</th><th>Market cap</th>
         <th>Price</th><th>Score</th><th>3M momentum</th>
-        <th>Revenue growth</th><th>Forward P/E</th>
+        <th>Revenue growth</th><th>Earnings growth</th>
+        <th>Forward P/E</th><th>Cash + ST investments</th>
+        <th>Total debt</th><th>Financial provider</th>
+        <th>Income date</th><th>Balance date</th>
         <th>Data quality</th><th>Warnings</th>
       </tr></thead>
       <tbody id="stocks">
-        <tr><td colspan="10">Loading research data...</td></tr>
+        <tr><td colspan="16">Loading research data...</td></tr>
       </tbody>
     </table>
   </div>
   <div class="status" id="status">Connecting to research data...</div>
 
   <div class="disclaimer">
-    <strong>Research disclaimer:</strong> Scores are experimental
-    screening heuristics, not investment recommendations or
-    predictions. Market data comes from Yahoo Finance through
-    yfinance and may be delayed, incomplete or inaccurate.
-    Verify financial information independently. Data completeness
-    describes availability, not investment risk.
+    <strong>Research disclaimer:</strong> Scores are experimental screening heuristics,
+    not investment recommendations or predictions. Market data comes from Yahoo Finance
+    through yfinance and may be delayed, incomplete or inaccurate. Financial fundamentals
+    use FMP where available, with Yahoo Finance fallback. A provider label describes data
+    availability, not data quality or investment risk. Verify financial information
+    independently before making decisions.
   </div>
 </main>
 
@@ -129,17 +132,15 @@ h1{font-size:23px}
 let stocks = [];
 
 const fmt = (v, suffix = "") =>
-  v === null || v === undefined || !Number.isFinite(Number(v))
+  v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
     ? "—" : Number(v).toFixed(1) + suffix;
 
 const money = v =>
-  v === null || v === undefined || !Number.isFinite(Number(v))
-    ? "—" : "$" + Number(v).toLocaleString("en-US",
-        {maximumFractionDigits:2});
+  v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
+    ? "—" : "$" + Number(v).toLocaleString("en-US",{maximumFractionDigits:0});
 
 const esc = value => String(value ?? "").replace(/[&<>"']/g,
-  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",
-         '"':"&quot;","'":"&#39;"}[c]));
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function render() {
   const query = document.getElementById("search").value.toLowerCase();
@@ -153,37 +154,42 @@ function render() {
   );
 
   rows.sort((a,b) =>
-    (Number(b[sort]) || -Infinity) -
-    (Number(a[sort]) || -Infinity)
+    (Number(b[sort]) || -Infinity) - (Number(a[sort]) || -Infinity)
   );
 
   document.getElementById("stocks").innerHTML = rows.map(s => {
     const momentum = Number(s.momentum_3m);
     const growth = Number(s.revenue_growth);
+    const earnings = Number(s.earnings_growth);
     const dataWarning = s.research_data_warning || "Unknown";
     const warnings = [
-      s.growth_warning && s.growth_warning !== "None"
-        ? s.growth_warning : "",
+      s.growth_warning && s.growth_warning !== "None" ? s.growth_warning : "",
       dataWarning !== "Low" ? dataWarning + " data coverage" : ""
     ].filter(Boolean).join("; ") || "None";
 
+    const provider = s.financial_data_source || "Unknown";
+    const providerLabel = provider.includes("FMP") ? "FMP" :
+      provider.includes("Yahoo") ? "Yahoo fallback" : provider;
+
     return `<tr>
-      <td><span class="ticker">${esc(s.ticker)}</span><br>
-        ${esc(s.company)}</td>
+      <td><span class="ticker">${esc(s.ticker)}</span><br>${esc(s.company)}</td>
       <td>${esc(s.sector)}</td>
       <td>${esc(s.market_cap_category)}</td>
       <td>${money(s.price)}</td>
       <td class="gold"><strong>${fmt(s.score)}</strong></td>
-      <td class="${momentum >= 0 ? "positive":"negative"}">
-        ${fmt(s.momentum_3m,"%")}</td>
-      <td class="${growth >= 0 ? "positive":"negative"}">
-        ${fmt(s.revenue_growth,"%")}</td>
+      <td class="${momentum >= 0 ? "positive":"negative"}">${fmt(s.momentum_3m,"%")}</td>
+      <td class="${growth >= 0 ? "positive":"negative"}">${fmt(s.revenue_growth,"%")}</td>
+      <td class="${earnings >= 0 ? "positive":"negative"}">${fmt(s.earnings_growth,"%")}</td>
       <td>${fmt(s.forward_pe)}</td>
+      <td>${money(s.fmp_cash_and_short_term_investments)}</td>
+      <td>${money(s.fmp_total_debt)}</td>
+      <td><span class="pill">${esc(providerLabel)}</span></td>
+      <td>${esc(s.fmp_income_date || "—")}</td>
+      <td>${esc(s.fmp_balance_date || "—")}</td>
       <td>${fmt(s.data_completeness_pct,"%")}</td>
-      <td class="${warnings === "None" ? "good":"warning"}">
-        ${esc(warnings)}</td>
+      <td class="${warnings === "None" ? "good":"warning"}">${esc(warnings)}</td>
     </tr>`;
-  }).join("") || '<tr><td colspan="10">No matching stocks found.</td></tr>';
+  }).join("") || '<tr><td colspan="16">No matching stocks found.</td></tr>';
 
   document.getElementById("status").textContent =
     `Showing ${rows.length} of ${stocks.length} stocks`;
@@ -196,10 +202,10 @@ async function loadData() {
     const data = await response.json();
 
     stocks = data.stocks || [];
+    const coverage = data.financial_data_coverage || {};
     const scored = stocks.filter(s => Number.isFinite(Number(s.score)));
     const average = scored.length
-      ? scored.reduce((sum,s) => sum + Number(s.score),0) / scored.length
-      : null;
+      ? scored.reduce((sum,s) => sum + Number(s.score),0) / scored.length : null;
     const complete = stocks.filter(s =>
       Number(s.data_completeness_pct) === 100).length;
     const best = scored.length
@@ -207,19 +213,33 @@ async function loadData() {
 
     document.getElementById("total").textContent = stocks.length;
     document.getElementById("average").textContent = fmt(average);
-    document.getElementById("complete").textContent =
-      complete + " / " + stocks.length;
+    document.getElementById("complete").textContent = complete + " / " + stocks.length;
     document.getElementById("top").textContent = fmt(best);
+
+    document.getElementById("fmpCount").textContent =
+      `${coverage.fmp_stocks ?? "—"} / ${stocks.length}`;
+    document.getElementById("yahooCount").textContent =
+      `${coverage.yahoo_fallback_stocks ?? "—"} / ${stocks.length}`;
+    document.getElementById("incomeCount").textContent =
+      coverage.fmp_income_statements ?? "—";
+    document.getElementById("balanceCount").textContent =
+      coverage.fmp_balance_sheets ?? "—";
+
+    const symbols = coverage.fmp_symbols || [];
+    document.getElementById("coverageNote").textContent =
+      `FMP statements available for: ${symbols.join(", ") || "None reported"}. ` +
+      `Market data: ${data.data_sources?.market_data || "Provider not specified"}. ` +
+      `Financial fundamentals use FMP where available and Yahoo fallback otherwise.`;
 
     render();
     document.getElementById("status").textContent =
       `Loaded ${stocks.length} stocks · Report: ${data.report} · ` +
-      `Generated: ${data.generated_at}`;
+      `Generated: ${data.generated_at} · Version: ${data.version}`;
   } catch (error) {
     document.getElementById("status").textContent =
       "Could not load research data: " + error.message;
     document.getElementById("stocks").innerHTML =
-      '<tr><td colspan="10">Check that frontend/data/latest.json exists and the site is served over HTTP.</td></tr>';
+      '<tr><td colspan="16">Check that frontend/data/latest.json exists and the site is served over HTTP.</td></tr>';
   }
 }
 

@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import json
+import requests
 import os
 from datetime import datetime, timezone
 
@@ -82,6 +83,82 @@ def get_financial_growth(statement, row_name):
     except (KeyError, IndexError, TypeError, ValueError):
         return None
 
+
+FMP_WORKER_URL = "https://mind-money-api.williamsob777.workers.dev"
+
+
+def get_fmp_records(endpoint, symbol):
+    """Retrieve annual financial statements through our Cloudflare Worker."""
+    try:
+        response = requests.get(
+            f"{FMP_WORKER_URL}/api/{endpoint}",
+            params={"symbol": symbol},
+            timeout=20
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+        if not isinstance(payload, list):
+            return []
+
+        # Only compare annual fiscal-year records.
+        annual = [
+            item for item in payload
+            if isinstance(item, dict)
+            and str(item.get("period", "")).upper() in ("FY", "ANNUAL")
+        ]
+
+        return sorted(
+            annual,
+            key=lambda item: item.get("date", ""),
+            reverse=True
+        )
+
+    except (requests.RequestException, ValueError, TypeError) as error:
+        print(f"FMP {endpoint} unavailable for {symbol}: {error}")
+        return []
+
+
+def get_fmp_financials(symbol):
+    """Get income and balance-sheet records from FMP."""
+    income = get_fmp_records("income", symbol)
+    balance = get_fmp_records("balance", symbol)
+
+    return {
+        "income": income,
+        "balance": balance
+    }
+
+
+def fmp_growth(latest, previous, field):
+    """Calculate growth only when both annual values are positive."""
+    try:
+        newest = float(latest[field])
+        older = float(previous[field])
+
+        if older <= 1 or newest <= 0:
+            return None
+
+        return (newest / older) - 1
+
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def fmp_number(record, field):
+    """Safely read a numeric FMP field."""
+    if not record:
+        return None
+
+    try:
+        value = record.get(field)
+        if value is None:
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def analyze_stock(symbol):
     print(f"Scanning {symbol}...")
 
@@ -122,14 +199,41 @@ def analyze_stock(symbol):
     else:
         cap_category = "Large"
 
+    # FMP is the primary source for annual fundamentals.
+    # Yahoo Finance remains the fallback.
+    fmp = get_fmp_financials(symbol)
+
+    income_records = fmp["income"]
+    balance_records = fmp["balance"]
+
+    latest_income = income_records[0] if income_records else None
+    previous_income = income_records[1] if len(income_records) > 1 else None
+    latest_balance = balance_records[0] if balance_records else None
+
+    revenue_growth = None
+    earnings_growth = None
+
+    if latest_income and previous_income:
+        revenue_growth = fmp_growth(
+            latest_income, previous_income, "revenue"
+        )
+        earnings_growth = fmp_growth(
+            latest_income, previous_income, "netIncome"
+        )
+
+    # Fall back to Yahoo for any growth metric FMP could not provide.
     financials = stock.financials
 
-    revenue_growth = get_financial_growth(
-        financials, "Total Revenue"
-    )
-    earnings_growth = get_financial_growth(
-        financials, "Net Income"
-    )
+    if revenue_growth is None:
+        revenue_growth = get_financial_growth(
+            financials, "Total Revenue"
+        )
+
+    if earnings_growth is None:
+        earnings_growth = get_financial_growth(
+            financials, "Net Income"
+        )
+
 
     growth_warnings = []
 
@@ -167,8 +271,29 @@ def analyze_stock(symbol):
         else:
             volume = 20
 
-    cash = safe_number(info.get("totalCash"))
-    debt = safe_number(info.get("totalDebt"))
+    cash = fmp_number(
+        latest_balance, "cashAndShortTermInvestments"
+    )
+
+    if cash is None and latest_balance:
+        cash_equivalents = fmp_number(
+            latest_balance, "cashAndCashEquivalents"
+        )
+        short_investments = fmp_number(
+            latest_balance, "shortTermInvestments"
+        )
+
+        if cash_equivalents is not None:
+            cash = cash_equivalents + (short_investments or 0)
+
+    debt = fmp_number(latest_balance, "totalDebt")
+
+    if cash is None:
+        cash = safe_number(info.get("totalCash"))
+
+    if debt is None:
+        debt = safe_number(info.get("totalDebt"))
+
 
     financial_health = None
     if cash is not None and debt is not None:
@@ -264,6 +389,21 @@ def analyze_stock(symbol):
         "cash": cash,
         "debt": debt,
         "forward_pe": pe,
+        "financial_data_source": (
+            "FMP via Cloudflare"
+            if latest_income or latest_balance
+            else "Yahoo Finance fallback"
+        ),
+        "fmp_income_date": (
+            latest_income.get("date") if latest_income else None
+        ),
+        "fmp_balance_date": (
+            latest_balance.get("date") if latest_balance else None
+        ),
+        "fmp_revenue": fmp_number(latest_income, "revenue"),
+        "fmp_net_income": fmp_number(latest_income, "netIncome"),
+        "fmp_cash_and_short_term_investments": cash,
+        "fmp_total_debt": debt,
         "score": round(score, 1) if score is not None else None,
         "growth_warning": (
             "; ".join(growth_warnings)
